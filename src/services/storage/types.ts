@@ -18,4 +18,5 @@ export interface StorageProvider {
   delete(key: string): Promise<void>;
   getSignedDownloadUrl(key: string, expiresInSeconds?: number): Promise<string>;
   exists(key: string): Promise<boolean>;
+  ensureBucket(): Promise<void>;
 }

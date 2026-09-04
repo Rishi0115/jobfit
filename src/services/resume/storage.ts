@@ -55,3 +55,7 @@ export async function getResumeDownloadUrl(
 ): Promise<string> {
   return storageService.getSignedDownloadUrl(storageKey, expiresInSeconds);
 }
+
+export async function ensureResumeBucket(): Promise<void> {
+  await storageService.ensureBucket();
+}

@@ -18,4 +18,28 @@ export const usersDAL = {
       where: { email },
     });
   },
+
+  upsertProfile: async (
+    userId: string,
+    data: {
+      bio?: string | null;
+      phone?: string | null;
+      location?: string | null;
+      targetRole?: string | null;
+      experienceLevel?: any;
+      preferredWorkMode?: any;
+      linkedinUrl?: string | null;
+      githubUrl?: string | null;
+      portfolioUrl?: string | null;
+    }
+  ) => {
+    return db.profile.upsert({
+      where: { userId },
+      create: {
+        userId,
+        ...data,
+      },
+      update: data,
+    });
+  },
 };

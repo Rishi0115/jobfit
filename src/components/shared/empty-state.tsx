@@ -1,4 +1,7 @@
+"use client";
+
 import * as React from "react";
+import Link from "next/link";
 import { FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,9 +21,16 @@ export function EmptyState({
   description,
   actionLabel,
   onAction,
+  actionHref,
   className,
   ...props
 }: EmptyStateProps) {
+  const actionButton = actionLabel ? (
+    <Button onClick={onAction} size="sm">
+      {actionLabel}
+    </Button>
+  ) : null;
+
   return (
     <div
       className={cn(
@@ -36,10 +46,10 @@ export function EmptyState({
       {description && (
         <p className="text-sm text-gray-500 max-w-md mb-6">{description}</p>
       )}
-      {actionLabel && onAction && (
-        <Button onClick={onAction} size="sm">
-          {actionLabel}
-        </Button>
+      {actionButton && actionHref ? (
+        <Link href={actionHref}>{actionButton}</Link>
+      ) : (
+        actionButton
       )}
     </div>
   );

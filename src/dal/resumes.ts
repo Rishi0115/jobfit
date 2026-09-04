@@ -170,4 +170,56 @@ export const resumesDAL = {
       return { deletedResume: resumeToDelete, newlyActiveResume };
     });
   },
+
+  async createResumeVersion(params: {
+    userId: string;
+    sourceResumeId: string;
+    rawText: string;
+    fileName?: string;
+  }): Promise<Resume> {
+    return db.$transaction(async (tx) => {
+      // 1. Verify source resume belongs to user
+      const source = await tx.resume.findFirst({
+        where: { id: params.sourceResumeId, userId: params.userId },
+      });
+
+      if (!source) {
+        throw new Error("Source resume not found or unauthorized");
+      }
+
+      // 2. Determine next version number
+      const latest = await tx.resume.findFirst({
+        where: { userId: params.userId },
+        orderBy: { version: "desc" },
+        select: { version: true },
+      });
+      const nextVersion = (latest?.version ?? source.version) + 1;
+
+      // 3. Deactivate all existing resumes for this user
+      await tx.resume.updateMany({
+        where: { userId: params.userId, isActive: true },
+        data: { isActive: false },
+      });
+
+      // 4. Create new version record preserving original fileUrl while saving updated text
+      const baseName = source.fileName.replace(/\.[^/.]+$/, "");
+      const ext = source.fileName.split(".").pop() || "txt";
+      const newFileName =
+        params.fileName || `${baseName}_v${nextVersion}.${ext}`;
+
+      return tx.resume.create({
+        data: {
+          userId: params.userId,
+          fileName: newFileName,
+          fileUrl: source.fileUrl,
+          fileSize: Buffer.byteLength(params.rawText, "utf8"),
+          mimeType: source.mimeType,
+          version: nextVersion,
+          isActive: true,
+          status: "READY",
+          rawText: params.rawText,
+        },
+      });
+    });
+  },
 };

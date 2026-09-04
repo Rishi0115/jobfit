@@ -227,24 +227,26 @@ model Profile {
 // ─── COMPANY & JOBS MODELS ───
 
 model Company {
-  id          String    @id @default(cuid())
-  name        String
-  description String?   @db.Text
-  website     String?
-  logoUrl     String?
-  industry    String?
-  size        String? // e.g., "11-50", "51-200"
-  location    String?
-  isVerified  Boolean   @default(false)
-  recruiterId String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id             String    @id @default(cuid())
+  name           String
+  normalizedName String?
+  description    String?   @db.Text
+  website        String?
+  logoUrl        String?
+  industry       String?
+  size           String? // e.g., "11-50", "51-200"
+  location       String?
+  isVerified     Boolean   @default(false)
+  recruiterId    String?   @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
-  recruiter User  @relation("CompanyRecruiter", fields: [recruiterId], references: [id])
+  recruiter User?  @relation("CompanyRecruiter", fields: [recruiterId], references: [id])
   jobs      Job[]
 
   @@index([name])
+  @@index([normalizedName])
   @@index([recruiterId])
 }
 
@@ -281,6 +283,7 @@ model Job {
   sourceId        String
   externalJobId   String? // ID from external source
   applicationUrl  String? // Original application URL
+  sourceMetadata  Json? // Raw data from external source
   postedAt        DateTime?
   expiresAt       DateTime?
   status          JobStatus        @default(ACTIVE)
@@ -305,6 +308,7 @@ model Job {
   @@index([posterId])
   @@index([experienceLevel])
   @@index([workMode])
+  @@index([employmentType])
   @@index([postedAt])
   @@index([createdAt])
 }

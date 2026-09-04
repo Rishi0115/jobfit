@@ -34,6 +34,10 @@ export class MemoryStorageProvider implements StorageProvider {
     return this.store.has(key);
   }
 
+  async ensureBucket(): Promise<void> {
+    // In-memory storage does not require an external bucket
+  }
+
   clear(): void {
     this.store.clear();
   }

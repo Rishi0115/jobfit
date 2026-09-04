@@ -1,4 +1,5 @@
 import mammoth from "mammoth";
+import { extractText } from "unpdf";
 
 export interface ExtractedTextResult {
   text: string;
@@ -9,6 +10,9 @@ export interface ExtractedTextResult {
 
 /**
  * Extract raw text from PDF or DOCX file buffer.
+ *
+ * Uses `unpdf` for robust, modern PDF text extraction across all JavaScript runtimes
+ * (Next.js, Node.js, Turbopack) without brittle CommonJS test-fixture side-effects.
  */
 export async function extractResumeText(
   buffer: Buffer,
@@ -20,11 +24,11 @@ export async function extractResumeText(
   let pageCount: number | undefined;
 
   if (ext === ".pdf") {
-    // Dynamic import to avoid loading CJS modules during static route analysis
-    const pdfParse = (await import("pdf-parse")).default || (await import("pdf-parse"));
-    const data = await pdfParse(buffer);
-    rawText = data.text || "";
-    pageCount = data.numpages;
+    const result = await extractText(new Uint8Array(buffer), {
+      mergePages: true,
+    });
+    rawText = result.text;
+    pageCount = result.totalPages;
   } else if (ext === ".docx" || ext === ".doc") {
     const result = await mammoth.extractRawText({ buffer });
     rawText = result.value || "";

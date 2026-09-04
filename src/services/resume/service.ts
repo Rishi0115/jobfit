@@ -1,6 +1,7 @@
 import { resumesDAL } from "@/dal/resumes";
 import { validateResumeFile, FileValidationResult } from "./file-validator";
 import { uploadResumeFile, deleteResumeFile } from "./storage";
+import { storageService } from "@/services/storage";
 import { extractResumeText } from "./parser";
 import { Resume } from "@prisma/client";
 
@@ -65,8 +66,19 @@ export class ResumeService {
 
       // 5. Extract text from document
       try {
+        // Retrieve uploaded file bytes from storage to ensure the extraction pipeline parses the persisted artifact
+        let fileBytes = buffer;
+        try {
+          const downloaded = await storageService.download(storageKey);
+          if (downloaded && downloaded.length > 0) {
+            fileBytes = downloaded;
+          }
+        } catch {
+          fileBytes = buffer;
+        }
+
         const extraction = await extractResumeText(
-          buffer,
+          fileBytes,
           validation.extension
         );
 

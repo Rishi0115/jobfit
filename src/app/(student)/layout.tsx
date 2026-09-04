@@ -9,6 +9,7 @@ import {
   GraduationCap,
   MessageSquare,
   Sparkles,
+  ClipboardList,
 } from "lucide-react";
 import { UserMenu } from "@/components/user-menu";
 import { StudentMobileNav } from "@/components/layout/mobile-nav";
@@ -16,9 +17,10 @@ import { StudentMobileNav } from "@/components/layout/mobile-nav";
 const STUDENT_NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Resume", href: "/resume", icon: FileText },
-  { label: "Jobs", href: "/jobs", icon: Briefcase },
+  { label: "Jobs", href: "/student/jobs", icon: Briefcase },
+  { label: "Applications", href: "/student/applications", icon: ClipboardList },
   { label: "DSA Prep", href: "/dsa", icon: GraduationCap },
-  { label: "Interview", href: "/interview", icon: MessageSquare },
+  { label: "Interview", href: "/student/mock-interview/setup", icon: MessageSquare },
 ];
 
 export default async function StudentLayout({

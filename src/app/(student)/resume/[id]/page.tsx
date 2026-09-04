@@ -9,6 +9,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { resumesDAL } from "@/dal/resumes";
 import { getResumeDownloadUrl } from "@/services/resume/storage";
 import { formatDate } from "@/lib/utils";
+import { ResumeImproverDrawer } from "@/components/resume/resume-improver-drawer";
 import {
   FileText,
   Download,
@@ -64,9 +65,16 @@ export default async function ResumeDetailPage({
                 Back
               </Button>
             </Link>
+            {resume.status === "READY" && resume.rawText && (
+              <ResumeImproverDrawer
+                resumeId={resume.id}
+                resumeFileName={resume.fileName}
+                resumeVersion={resume.version}
+              />
+            )}
             {downloadUrl && (
               <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-                <Button size="sm" leftIcon={<Download className="h-4 w-4" />}>
+                <Button size="sm" variant="outline" leftIcon={<Download className="h-4 w-4" />}>
                   Download
                 </Button>
               </a>

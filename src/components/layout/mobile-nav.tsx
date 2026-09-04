@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 const MOBILE_NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Jobs", href: "/jobs", icon: Briefcase },
+  { label: "Jobs", href: "/student/jobs", icon: Briefcase },
   { label: "Resume", href: "/resume", icon: FileText },
   { label: "Interview", href: "/interview", icon: MessageSquare },
   { label: "More", href: "/profile", icon: MoreHorizontal },

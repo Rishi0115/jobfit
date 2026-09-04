@@ -7,14 +7,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { resumesDAL } from "@/dal/resumes";
-import { FileText, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+import { matchingService } from "@/services/matching";
+import {
+  FileText,
+  Sparkles,
+  ArrowRight,
+  CheckCircle2,
+  TrendingUp,
+  MessageSquare,
+} from "lucide-react";
 
 export default async function StudentDashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
   const user = session.user as { name?: string; role?: string; id?: string };
-  const activeResume = await resumesDAL.findActiveResume(session.user.id);
+  const [activeResume, topMatches] = await Promise.all([
+    resumesDAL.findActiveResume(session.user.id),
+    matchingService.getTopMatches(session.user.id, 5),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -81,8 +92,21 @@ export default async function StudentDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0 flex items-center justify-between">
-            <span className="text-sm text-gray-400 font-medium">0 Matches</span>
-            <Badge variant="outline">Phase 5</Badge>
+            {topMatches.length > 0 ? (
+              <div>
+                <p className="text-xl font-bold text-gray-900">
+                  {topMatches[0].match.overallScore}%
+                </p>
+                <p className="text-xs text-gray-500">Top Match Score</p>
+              </div>
+            ) : (
+              <span className="text-sm text-gray-400 font-medium">0 Matches</span>
+            )}
+            <Link href="/student/jobs">
+              <Button size="sm" variant="outline" className="h-7 text-xs">
+                View Jobs
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -104,7 +128,7 @@ export default async function StudentDashboardPage() {
                     Active Resume: {activeResume.fileName}
                   </h4>
                   <p className="text-sm text-gray-500 mt-0.5">
-                    Text extracted and saved. Ready for deterministic job matching (Phase 5) and AI skill analysis (Phase 7).
+                    Text extracted and indexed. Deterministic job matching active (Phase 6).
                   </p>
                 </div>
               </div>
@@ -120,10 +144,44 @@ export default async function StudentDashboardPage() {
               title="Upload your resume to start job matching"
               description="Upload your resume (PDF or DOCX) to automatically extract your skills and get matched with top developer jobs."
               actionLabel="Upload Resume"
-              onAction={() => {}}
               actionHref="/resume"
             />
           )}
+        </CardContent>
+      </Card>
+
+      {/* Mock Interview Quick Action */}
+      <Card className="border-purple-200 bg-purple-50/20">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start space-x-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-700">
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-base font-semibold text-gray-900">
+                    AI Mock Interview Simulation
+                  </h4>
+                  <Badge variant="purple" className="text-[10px]">
+                    Interactive
+                  </Badge>
+                </div>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Practice role-targeted and resume-based technical interviews with dynamic follow-up probing and immediate scorecard feedback.
+                </p>
+              </div>
+            </div>
+            <Link href="/student/mock-interview/setup" className="shrink-0 self-end sm:self-center">
+              <Button
+                size="sm"
+                rightIcon={<ArrowRight className="h-4 w-4" />}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                Practice Interview
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

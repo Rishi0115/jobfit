@@ -64,6 +64,7 @@ export default auth((req) => {
 
   // Student-only routes (recruiters blocked, admins allowed)
   if (
+    pathname.startsWith("/student") ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/profile") ||
     pathname.startsWith("/resume") ||
